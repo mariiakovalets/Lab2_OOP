@@ -7,17 +7,10 @@ using Lab2_oop.AvaloniaApp.LogLibrary;
 
 namespace Lab2_oop.AvaloniaApp.Parsers;
 
-/// <summary>
-/// Стратегія парсингу XML за допомогою LINQ to XML
-/// Найзручніша для роботи з C#
-/// </summary>
 public class LINQParsingStrategy : IXmlParserStrategy
 {
     public string StrategyName => "LINQ to XML";
     
-    /// <summary>
-    /// Парсить XML файл за допомогою LINQ to XML
-    /// </summary>
     public List<Student> ParseStudents(string xmlPath, string searchAttribute, string searchValue)
     {
         Logger.Instance.Log("Low", $"LINQ парсинг розпочато | Атрибут: {searchAttribute} | Значення: {searchValue}");
@@ -26,18 +19,14 @@ public class LINQParsingStrategy : IXmlParserStrategy
         
         try
         {
-            // Завантажуємо XML документ
             XDocument doc = XDocument.Load(xmlPath);
             
-            // Отримуємо всіх студентів
             var studentElements = doc.Descendants("Student");
             
             foreach (var studentElement in studentElements)
             {
-                // Парсимо студента
                 var student = ParseStudentElement(studentElement);
                 
-                // Перевіряємо чи відповідає критерію пошуку
                 if (string.IsNullOrWhiteSpace(searchValue) || MatchesSearchCriteria(student, searchAttribute, searchValue))
                 {
                     students.Add(student);
@@ -54,9 +43,6 @@ public class LINQParsingStrategy : IXmlParserStrategy
         return students;
     }
     
-    /// <summary>
-    /// Отримує доступні атрибути з XML файлу
-    /// </summary>
     public List<string> GetAvailableAttributes(string xmlPath)
     {
         var attributes = new HashSet<string>();
@@ -67,7 +53,6 @@ public class LINQParsingStrategy : IXmlParserStrategy
             
             var students = doc.Descendants("Student");
             
-            // Збираємо всі унікальні атрибути
             foreach (var student in students)
             {
                 foreach (var attr in student.Attributes())
@@ -77,12 +62,10 @@ public class LINQParsingStrategy : IXmlParserStrategy
                 }
             }
             
-            // Додаємо поля з PersonalInfo
             attributes.Add("FullName");
             attributes.Add("Faculty");
             attributes.Add("Department");
             
-            // Додаємо Subject
             attributes.Add("Subject");
             
             Logger.Instance.Log("Low", $"LINQ: знайдено {attributes.Count} атрибутів");
@@ -95,9 +78,7 @@ public class LINQParsingStrategy : IXmlParserStrategy
         return attributes.OrderBy(a => a).ToList();
     }
     
-    /// <summary>
-    /// Парсить один елемент Student в об'єкт Student
-    /// </summary>
+
     private Student ParseStudentElement(XElement studentElement)
     {
         var student = new Student
@@ -105,7 +86,7 @@ public class LINQParsingStrategy : IXmlParserStrategy
             Year = ParseNullableInt(studentElement.Attribute("year")?.Value)
         };
         
-        // Парсимо PersonalInfo
+
         var personalInfoElement = studentElement.Element("PersonalInfo");
         if (personalInfoElement != null)
         {
@@ -117,7 +98,6 @@ public class LINQParsingStrategy : IXmlParserStrategy
             };
         }
         
-        // Парсимо Subjects
         var subjectsElement = studentElement.Element("Subjects");
         if (subjectsElement != null)
         {
@@ -136,9 +116,6 @@ public class LINQParsingStrategy : IXmlParserStrategy
         return student;
     }
     
-    /// <summary>
-    /// Перевіряє чи відповідає студент критерію пошуку
-    /// </summary>
     private bool MatchesSearchCriteria(Student student, string searchAttribute, string searchValue)
     {
         if (string.IsNullOrWhiteSpace(searchValue))
@@ -157,9 +134,6 @@ public class LINQParsingStrategy : IXmlParserStrategy
         };
     }
     
-    /// <summary>
-    /// Допоміжний метод для парсингу nullable int
-    /// </summary>
     private int? ParseNullableInt(string? value)
     {
         if (string.IsNullOrWhiteSpace(value))

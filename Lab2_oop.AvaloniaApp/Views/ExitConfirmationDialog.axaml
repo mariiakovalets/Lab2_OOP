@@ -19,7 +19,6 @@
                     Spacing="15"
                     HorizontalAlignment="Center">
             
-            <!-- Кнопка ТАК -->
             <Button Content="Так"
                     Width="120"
                     Height="40"
@@ -44,7 +43,6 @@
                 </Button.Styles>
             </Button>
             
-            <!-- Кнопка НІ -->
             <Button Content="Ні"
                     Width="120"
                     Height="40"

@@ -5,31 +5,18 @@ namespace Lab2_oop.AvaloniaApp.Models;
 
 public class Student
 {
-    /// <summary>
-    /// Номер рядка для відображення в таблиці
-    /// </summary>
+
+
     public int RowNumber { get; set; }
     
-    /// <summary>
-    /// Курс навчання (1, 2, 3, 4) - nullable бо не у всіх студентів є
-    /// </summary>
     public int? Year { get; set; }
     
-    /// <summary>
-    /// Персональна інформація студента
-    /// </summary>
+
     public PersonalInfo PersonalInfo { get; set; } = new PersonalInfo();
     
-    /// <summary>
-    /// Список навчальних дисциплін (вкладені елементи)
-    /// </summary>
     public List<Subject> Subjects { get; set; } = new List<Subject>();
     
-    // ========== ОБЧИСЛЮВАНІ ВЛАСТИВОСТІ ==========
-    
-    /// <summary>
-    /// Середній бал студента
-    /// </summary>
+
     public double AverageGrade
     {
         get
@@ -45,9 +32,7 @@ public class Student
         }
     }
     
-    /// <summary>
-    /// Всі дисципліни з оцінками для відображення в таблиці
-    /// </summary>
+ 
     public string AllGradesDisplay
     {
         get
@@ -55,14 +40,12 @@ public class Student
             if (Subjects == null || !Subjects.Any())
                 return "Немає даних";
             
-            // Кожна дисципліна з нового рядка
+        
             return string.Join("\n", Subjects.Select(s => $"{s.Name}: {s.Grade}"));
         }
     }
     
-    /// <summary>
-    /// Конвертує літерну оцінку в числову
-    /// </summary>
+
     private double ConvertGradeToNumber(string grade)
     {
         return grade.ToUpper() switch

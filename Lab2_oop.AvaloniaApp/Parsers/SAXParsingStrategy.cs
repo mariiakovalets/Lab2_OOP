@@ -7,18 +7,10 @@ using Lab2_oop.AvaloniaApp.LogLibrary;
 
 namespace Lab2_oop.AvaloniaApp.Parsers;
 
-/// <summary>
-/// Стратегія парсингу XML за допомогою SAX API (XmlReader)
-/// Послідовно читає XML без завантаження всього документа в пам'ять
-/// Найефективніша для великих файлів
-/// </summary>
 public class SAXParsingStrategy : IXmlParserStrategy
 {
     public string StrategyName => "SAX API";
     
-    /// <summary>
-    /// Парсить XML файл за допомогою XmlReader (SAX-подібний підхід)
-    /// </summary>
     public List<Student> ParseStudents(string xmlPath, string searchAttribute, string searchValue)
     {
         Logger.Instance.Log("Low", $"SAX парсинг розпочато | Атрибут: {searchAttribute} | Значення: {searchValue}");
@@ -45,7 +37,6 @@ public class SAXParsingStrategy : IXmlParserStrategy
                             {
                                 currentStudent = new Student();
                                 
-                                // Читаємо атрибути
                                 if (reader.HasAttributes)
                                 {
                                     currentStudent.Year = ParseNullableInt(reader.GetAttribute("year"));
@@ -62,7 +53,6 @@ public class SAXParsingStrategy : IXmlParserStrategy
                             break;
                         
                         case XmlNodeType.Text:
-                            // Читаємо текстовий вміст елемента
                             if (currentElement == "FullName" && currentPersonalInfo != null)
                             {
                                 currentPersonalInfo.FullName = reader.Value;
@@ -98,7 +88,6 @@ public class SAXParsingStrategy : IXmlParserStrategy
                             }
                             else if (reader.Name == "Student" && currentStudent != null)
                             {
-                                // Перевіряємо критерій пошуку
                                 if (string.IsNullOrWhiteSpace(searchValue) || MatchesSearchCriteria(currentStudent, searchAttribute, searchValue))
                                 {
                                     students.Add(currentStudent);

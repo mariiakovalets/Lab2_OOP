@@ -11,7 +11,6 @@
         Background="White">
 
 <Window.Styles>
-<!-- TextBox -->
 <Style Selector="TextBox.search-input">
     <Setter Property="Background" Value="White"/>
     <Setter Property="Foreground" Value="#172f47"/>
@@ -42,7 +41,6 @@
     <Setter Property="Foreground" Value="#172f47"/>
 </Style>
 
-<!-- Watermark -->
 <Style Selector="TextBox.search-input /template/ TextBlock#PART_Watermark">
     <Setter Property="Foreground" Value="#9ca3af"/>
 </Style>
@@ -59,7 +57,7 @@
     <Setter Property="Opacity" Value="0"/>
 </Style>
 
-<!-- ComboBox -->
+
 <Style Selector="ComboBox.strategy-combo">
     <Setter Property="Background" Value="White"/>
     <Setter Property="Foreground" Value="#172f47"/>
@@ -158,7 +156,7 @@
 
 <Grid RowDefinitions="Auto,Auto,*,Auto" Margin="20">
         
-        <!-- РЯД 1: ФАЙЛ -->
+
         <StackPanel Grid.Row="0" 
                     Orientation="Horizontal" 
                     Spacing="15"
@@ -204,14 +202,14 @@
             </StackPanel>
         </StackPanel>
         
-<!-- РЯД 2: МЕТОД ПАРСИНГУ, ФІЛЬТР, ЗНАЧЕННЯ, КНОПКА ПОКАЗАТИ -->
+
 <StackPanel Grid.Row="1" 
             Orientation="Horizontal" 
             Spacing="40"
             Margin="15,0,0,20"
             VerticalAlignment="Center">
     
-    <!-- Метод парсингу -->
+
     <StackPanel Spacing="8">
         <TextBlock Text="Метод парсингу"
                    FontSize="14"
@@ -226,7 +224,6 @@
                   x:Name="CmbParsingStrategy"/>
     </StackPanel>
     
-    <!-- Фільтр -->
     <StackPanel Spacing="8">
         <TextBlock Text="Фільтр"
                    FontSize="14"
@@ -247,7 +244,6 @@
         </ComboBox>
     </StackPanel>
     
-    <!-- Значення фільтра -->
     <StackPanel Spacing="8">
         <TextBlock Text="Виберіть значення"
                    FontSize="14"
@@ -268,7 +264,6 @@
         </ComboBox>
     </StackPanel>
     
-    <!-- Кнопка Показати -->
     <StackPanel Spacing="8">
         <TextBlock Text=" "
                    FontSize="14"
@@ -302,7 +297,6 @@
 </StackPanel>
     
         
-        <!-- РЕЗУЛЬТАТИ - ТАБЛИЦЯ -->
         <Border Grid.Row="2" 
                 BorderBrush="#d4d4d4"
                 BorderThickness="0"
@@ -315,7 +309,6 @@
                               HorizontalScrollBarVisibility="Auto"
                               VerticalScrollBarVisibility="Auto">
                     <StackPanel>
-                    <!-- Заголовки таблиці -->
                     <Grid x:Name="TableHeader"
                         ColumnDefinitions="60,200,60,130,200,150,*"
                         IsVisible="False"
@@ -368,7 +361,6 @@
                                         <Border Grid.Column="4" BorderBrush="#e0e0e0" BorderThickness="0,0,1,0"/>
                                         <Border Grid.Column="5" BorderBrush="#e0e0e0" BorderThickness="0,0,1,0"/>
                                         
-                                        <!-- № -->
                                         <TextBlock Grid.Column="0" 
                                                 Text="{Binding RowNumber}" 
                                                 Foreground="#172f47" 
@@ -376,7 +368,6 @@
                                                 VerticalAlignment="Center"
                                                 HorizontalAlignment="Center"/>
                                         
-                                        <!-- ПІБ -->
                                         <TextBlock Grid.Column="1" 
                                                 Text="{Binding PersonalInfo.FullName}" 
                                                 Foreground="#172f47" 
@@ -384,7 +375,6 @@
                                                 VerticalAlignment="Center"
                                                 TextWrapping="Wrap"/>
                                         
-                                        <!-- Курс -->
                                         <TextBlock Grid.Column="2" 
                                                 Text="{Binding Year}" 
                                                 Foreground="#172f47" 
@@ -392,7 +382,6 @@
                                                 VerticalAlignment="Center"
                                                 HorizontalAlignment="Center"/>
                                         
-                                        <!-- Середній бал -->
                                         <TextBlock Grid.Column="3" 
                                                 Text="{Binding AverageGrade, StringFormat={}{0:F2}}" 
                                                 Foreground="#172f47" 
@@ -400,7 +389,6 @@
                                                 VerticalAlignment="Center"
                                                 HorizontalAlignment="Center"/>
                                         
-                                        <!-- Факультет -->
                                         <TextBlock Grid.Column="4" 
                                                 Text="{Binding PersonalInfo.Faculty}" 
                                                 Foreground="#172f47" 
@@ -408,7 +396,6 @@
                                                 VerticalAlignment="Center"
                                                 TextWrapping="Wrap"/>
                                         
-                                        <!-- Кафедра -->
                                         <TextBlock Grid.Column="5" 
                                                 Text="{Binding PersonalInfo.Department}" 
                                                 Foreground="#172f47" 
@@ -416,7 +403,6 @@
                                                 VerticalAlignment="Center"
                                                 TextWrapping="Wrap"/>
                                         
-                                        <!-- Дисципліни -->
                                         <TextBlock Grid.Column="6" 
                                                 Text="{Binding AllGradesDisplay}" 
                                                 Foreground="#172f47" 
@@ -432,8 +418,7 @@
                 </ScrollViewer>
             </Grid>
         </Border>
-        
-        <!-- ПАНЕЛЬ ДІЙ -->
+
         <Grid Grid.Row="3"
               ColumnDefinitions="*,Auto"
               Margin="15,15,0,0">

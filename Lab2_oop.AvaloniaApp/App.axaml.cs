@@ -40,7 +40,7 @@ public partial class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            desktop.MainWindow = new MainWindow(); // Тепер знайде!
+            desktop.MainWindow = new MainWindow(); 
         }
 
         base.OnFrameworkInitializationCompleted();

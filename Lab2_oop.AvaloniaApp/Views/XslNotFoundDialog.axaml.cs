@@ -8,12 +8,9 @@ public partial class XslNotFoundDialog : Window
 {
     private readonly string _directory;
     
-    // ✅ Публічний конструктор БЕЗ параметрів для XAML
     public XslNotFoundDialog() : this(string.Empty)
     {
     }
-    
-    // Конструктор з параметром для використання в коді
     public XslNotFoundDialog(string directory)
     {
         _directory = directory;

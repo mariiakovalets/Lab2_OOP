@@ -9,7 +9,7 @@
     
     <Grid RowDefinitions="*,Auto" Margin="20">
         
-        <!-- Текст помилки -->
+
         <StackPanel Grid.Row="0" 
                     Spacing="15"
                     VerticalAlignment="Center">
@@ -26,7 +26,6 @@
                        TextAlignment="Center"/>
         </StackPanel>
         
- <!-- Кнопка OK -->
 <Button Grid.Row="1"
         Content="OK"
         Width="100"
