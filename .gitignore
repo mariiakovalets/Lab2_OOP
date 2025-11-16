@@ -1,0 +1,11 @@
+bin/
+obj/
+.vs/
+.vscode/
+*.user
+*.sln.iml
+.DS_Store
+events.log
+*.html
+*.xsl
+*.xml

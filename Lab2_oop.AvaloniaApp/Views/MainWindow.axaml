@@ -1,0 +1,523 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="750"
+        x:Class="Lab2_oop.AvaloniaApp.Views.MainWindow"
+        x:CompileBindings="False"
+        Title="Лабораторна робота №2 - Успішність студентів"
+        Width="1200" Height="750"
+        WindowStartupLocation="CenterScreen"
+        Background="White">
+
+<Window.Styles>
+<!-- TextBox -->
+<Style Selector="TextBox.search-input">
+    <Setter Property="Background" Value="White"/>
+    <Setter Property="Foreground" Value="#172f47"/>
+    <Setter Property="BorderBrush" Value="#172f47"/>
+    <Setter Property="BorderThickness" Value="2"/>
+    <Setter Property="CornerRadius" Value="5"/>
+    <Setter Property="Padding" Value="10,8"/>
+    <Setter Property="FontSize" Value="14"/>
+</Style>
+
+<Style Selector="TextBox.search-input:focus /template/ Border#PART_BorderElement">
+    <Setter Property="Background" Value="White"/>
+    <Setter Property="BorderBrush" Value="#172f47"/>
+    <Setter Property="BorderThickness" Value="2"/>
+</Style>
+
+<Style Selector="TextBox.search-input:pointerover /template/ Border#PART_BorderElement">
+    <Setter Property="Background" Value="White"/>
+    <Setter Property="BorderBrush" Value="#172f47"/>
+    <Setter Property="BorderThickness" Value="2"/>
+</Style>
+
+<Style Selector="TextBox.search-input:pointerover">
+    <Setter Property="Foreground" Value="#172f47"/>
+</Style>
+
+<Style Selector="TextBox.search-input:focus">
+    <Setter Property="Foreground" Value="#172f47"/>
+</Style>
+
+<!-- Watermark -->
+<Style Selector="TextBox.search-input /template/ TextBlock#PART_Watermark">
+    <Setter Property="Foreground" Value="#9ca3af"/>
+</Style>
+
+<Style Selector="TextBox.search-input:pointerover /template/ TextBlock#PART_Watermark">
+    <Setter Property="Foreground" Value="#9ca3af"/>
+</Style>
+
+<Style Selector="TextBox.search-input:focus /template/ TextBlock#PART_Watermark">
+    <Setter Property="Opacity" Value="0"/>
+</Style>
+
+<Style Selector="TextBox.search-input:not(:empty) /template/ TextBlock#PART_Watermark">
+    <Setter Property="Opacity" Value="0"/>
+</Style>
+
+<!-- ComboBox -->
+<Style Selector="ComboBox.strategy-combo">
+    <Setter Property="Background" Value="White"/>
+    <Setter Property="Foreground" Value="#172f47"/>
+    <Setter Property="BorderBrush" Value="#172f47"/>
+    <Setter Property="BorderThickness" Value="2"/>
+    <Setter Property="CornerRadius" Value="5"/>
+    <Setter Property="Padding" Value="10,8"/>
+    <Setter Property="FontSize" Value="14"/>
+    <Setter Property="HorizontalContentAlignment" Value="Left"/>
+    <Setter Property="VerticalContentAlignment" Value="Center"/>
+</Style>
+
+<Style Selector="ComboBox.strategy-combo /template/ ToggleButton /template/ Border">
+    <Setter Property="Background" Value="Transparent"/>
+</Style>
+
+<Style Selector="ComboBox.strategy-combo /template/ ToggleButton /template/ Viewbox">
+    <Setter Property="RenderTransform" Value="rotate(0deg)"/>
+    <Setter Property="RenderTransformOrigin" Value="0.5, 0.5"/>
+    <Setter Property="Transitions">
+        <Transitions>
+            <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.2"/>
+        </Transitions>
+    </Setter>
+</Style>
+
+<Style Selector="ComboBox.strategy-combo /template/ ToggleButton:checked /template/ Viewbox">
+    <Setter Property="RenderTransform" Value="rotate(180deg)"/>
+</Style>
+
+<Style Selector="ComboBox.strategy-combo /template/ PathIcon">
+    <Setter Property="Foreground" Value="#172f47"/>
+</Style>
+
+<Style Selector="ComboBox.strategy-combo:pointerover /template/ Border#Background">
+    <Setter Property="Background" Value="White"/>
+    <Setter Property="BorderBrush" Value="#172f47"/>
+    <Setter Property="BorderThickness" Value="2"/>
+</Style>
+
+<Style Selector="ComboBox.strategy-combo:focus /template/ Border#Background">
+    <Setter Property="Background" Value="White"/>
+    <Setter Property="BorderBrush" Value="#172f47"/>
+    <Setter Property="BorderThickness" Value="2"/>
+</Style>
+
+<Style Selector="ComboBox.strategy-combo:pressed /template/ Border#Background">
+    <Setter Property="Background" Value="White"/>
+    <Setter Property="BorderBrush" Value="#172f47"/>
+    <Setter Property="BorderThickness" Value="2"/>
+</Style>
+
+<Style Selector="ComboBox.strategy-combo /template/ ContentPresenter#ContentPresenter">
+    <Setter Property="Foreground" Value="#172f47"/>
+    <Setter Property="Background" Value="Transparent"/>
+</Style>
+
+<Style Selector="ComboBox.strategy-combo /template/ Popup">
+    <Setter Property="OverlayDismissEventPassThrough" Value="True"/>
+</Style>
+
+<Style Selector="ComboBox.strategy-combo /template/ Border#PopupBorder">
+    <Setter Property="Background" Value="White"/>
+    <Setter Property="BorderBrush" Value="#172f47"/>
+    <Setter Property="BorderThickness" Value="1"/>
+    <Setter Property="CornerRadius" Value="5"/>
+    <Setter Property="Padding" Value="0"/>
+</Style>
+
+<Style Selector="ComboBoxItem">
+    <Setter Property="Background" Value="White"/>
+    <Setter Property="Foreground" Value="#172f47"/>
+    <Setter Property="Padding" Value="10,8"/>
+    <Setter Property="MinHeight" Value="32"/>
+</Style>
+
+<Style Selector="ComboBoxItem:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="#e8f4f8"/>
+    <Setter Property="Foreground" Value="#172f47"/>
+</Style>
+
+<Style Selector="ComboBoxItem:selected">
+    <Setter Property="Background" Value="#172f47"/>
+    <Setter Property="Foreground" Value="White"/>
+</Style>
+
+<Style Selector="ComboBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="#172f47"/>
+    <Setter Property="Foreground" Value="White"/>
+</Style>
+
+<Style Selector="ComboBox.strategy-combo:focus /template/ ContentPresenter#ContentPresenter">
+    <Setter Property="Foreground" Value="#172f47"/>
+</Style>
+</Window.Styles>
+
+<Grid RowDefinitions="Auto,Auto,*,Auto" Margin="20">
+        
+        <!-- РЯД 1: ФАЙЛ -->
+        <StackPanel Grid.Row="0" 
+                    Orientation="Horizontal" 
+                    Spacing="15"
+                    Margin="15,0,0,20"
+                    VerticalAlignment="Center">
+            
+            <StackPanel Spacing="8">
+                <TextBlock Text="Вхідний XML файл"
+                           FontSize="14"
+                           FontWeight="SemiBold"
+                           Foreground="#172f47"/>
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                    <Button Content="Обрати файл"
+                            Width="180"
+                            Height="40"
+                            Background="White"
+                            Foreground="#172f47"
+                            BorderBrush="#172f47"
+                            BorderThickness="2"
+                            CornerRadius="8"
+                            FontSize="14"
+                            Padding="15,10"
+                            Cursor="Hand"
+                            HorizontalContentAlignment="Center"
+                            VerticalContentAlignment="Center"
+                            x:Name="BtnSelectFile">
+                        <Button.Styles>
+                            <Style Selector="Button:pointerover /template/ ContentPresenter">
+                                <Setter Property="Background" Value="#172f47"/>
+                            </Style>
+                            <Style Selector="Button:pointerover">
+                                <Setter Property="Foreground" Value="White"/>
+                                <Setter Property="BorderBrush" Value="#172f47"/>
+                            </Style>
+                        </Button.Styles>
+                    </Button>
+                    <TextBlock Text="{Binding FileName}"
+                               VerticalAlignment="Center"
+                               x:Name="TxtFilePath"
+                               Foreground="#6b7280"
+                               FontSize="13"/>
+                </StackPanel>
+            </StackPanel>
+        </StackPanel>
+        
+<!-- РЯД 2: МЕТОД ПАРСИНГУ, ФІЛЬТР, ЗНАЧЕННЯ, КНОПКА ПОКАЗАТИ -->
+<StackPanel Grid.Row="1" 
+            Orientation="Horizontal" 
+            Spacing="40"
+            Margin="15,0,0,20"
+            VerticalAlignment="Center">
+    
+    <!-- Метод парсингу -->
+    <StackPanel Spacing="8">
+        <TextBlock Text="Метод парсингу"
+                   FontSize="14"
+                   FontWeight="SemiBold"
+                   Foreground="#172f47"/>
+        <ComboBox Width="280"
+                  Height="40"
+                  Classes="strategy-combo"
+                  PlaceholderText="Виберіть метод парсингу"
+                  ItemsSource="{Binding ParsingStrategies}"
+                  SelectedIndex="{Binding SelectedStrategyIndex}"
+                  x:Name="CmbParsingStrategy"/>
+    </StackPanel>
+    
+    <!-- Фільтр -->
+    <StackPanel Spacing="8">
+        <TextBlock Text="Фільтр"
+                   FontSize="14"
+                   FontWeight="SemiBold"
+                   Foreground="#172f47"/>
+        <ComboBox Width="280"
+                  Height="40"
+                  Classes="strategy-combo"
+                  PlaceholderText="Виберіть атрибут"
+                  ItemsSource="{Binding SearchAttributes}"
+                  SelectedIndex="{Binding SelectedAttributeIndex}"
+                  x:Name="CmbSearchAttribute">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Display}"/>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+    </StackPanel>
+    
+    <!-- Значення фільтра -->
+    <StackPanel Spacing="8">
+        <TextBlock Text="Виберіть значення"
+                   FontSize="14"
+                   FontWeight="SemiBold"
+                   Foreground="#172f47"/>
+        <ComboBox Width="280"
+                  Height="40"
+                  Classes="strategy-combo"
+                  ItemsSource="{Binding SearchValues}"
+                  SelectedIndex="{Binding SelectedValueIndex}"
+                  x:Name="CmbSearchValue"
+                  PlaceholderText="Немає значень">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding}" Padding="4"/>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+    </StackPanel>
+    
+    <!-- Кнопка Показати -->
+    <StackPanel Spacing="8">
+        <TextBlock Text=" "
+                   FontSize="14"
+                   FontWeight="SemiBold"/>
+        <Button Content="Показати"
+                Width="180"
+                Height="40"
+                Background="White"
+                Foreground="#172f47"
+                BorderBrush="#172f47"
+                BorderThickness="2"
+                CornerRadius="8"
+                FontSize="14"
+                Padding="15,10"
+                Cursor="Hand"
+                HorizontalContentAlignment="Center"
+                VerticalContentAlignment="Center"
+                x:Name="BtnSearch">
+            <Button.Styles>
+                <Style Selector="Button:pointerover /template/ ContentPresenter">
+                    <Setter Property="Background" Value="#172f47"/>
+                </Style>
+                <Style Selector="Button:pointerover">
+                    <Setter Property="Foreground" Value="White"/>
+                    <Setter Property="BorderBrush" Value="#172f47"/>
+                </Style>
+            </Button.Styles>
+        </Button>
+    </StackPanel>
+    
+</StackPanel>
+    
+        
+        <!-- РЕЗУЛЬТАТИ - ТАБЛИЦЯ -->
+        <Border Grid.Row="2" 
+                BorderBrush="#d4d4d4"
+                BorderThickness="0"
+                CornerRadius="8"
+                Background="Transparent"
+                Padding="15">
+            <Grid RowDefinitions="Auto,*">
+                
+                <ScrollViewer Grid.Row="1"
+                              HorizontalScrollBarVisibility="Auto"
+                              VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                    <!-- Заголовки таблиці -->
+                    <Grid x:Name="TableHeader"
+                        ColumnDefinitions="60,200,60,130,200,150,*"
+                        IsVisible="False"
+                        Background="#172f47"
+                        Margin="0,0,0,2">
+                        <Border Grid.Column="0" BorderBrush="White" BorderThickness="0,0,1,0"/>
+                        <Border Grid.Column="1" BorderBrush="White" BorderThickness="0,0,1,0"/>
+                        <Border Grid.Column="2" BorderBrush="White" BorderThickness="0,0,1,0"/>
+                        <Border Grid.Column="3" BorderBrush="White" BorderThickness="0,0,1,0"/>
+                        <Border Grid.Column="4" BorderBrush="White" BorderThickness="0,0,1,0"/>
+                        <Border Grid.Column="5" BorderBrush="White" BorderThickness="0,0,1,0"/>
+                        
+                        <TextBlock Grid.Column="0" Text="№" 
+                                Foreground="White" FontWeight="Bold" 
+                                Padding="8" HorizontalAlignment="Center"/>
+                        <TextBlock Grid.Column="1" Text="ПІБ" 
+                                Foreground="White" FontWeight="Bold" 
+                                Padding="8" HorizontalAlignment="Center"/>
+                        <TextBlock Grid.Column="2" Text="Курс" 
+                                Foreground="White" FontWeight="Bold" 
+                                Padding="8" HorizontalAlignment="Center"/>
+                        <TextBlock Grid.Column="3" Text="Середній бал" 
+                                Foreground="White" FontWeight="Bold" 
+                                Padding="8" HorizontalAlignment="Center"/>
+                        <TextBlock Grid.Column="4" Text="Факультет" 
+                                Foreground="White" FontWeight="Bold" 
+                                Padding="8" HorizontalAlignment="Center"/>
+                        <TextBlock Grid.Column="5" Text="Кафедра" 
+                                Foreground="White" FontWeight="Bold" 
+                                Padding="8" HorizontalAlignment="Center"/>
+                        <TextBlock Grid.Column="6" Text="Дисципліни" 
+                                Foreground="White" FontWeight="Bold" 
+                                Padding="8" HorizontalAlignment="Center"/>
+                    </Grid>
+                        
+                    <ItemsControl ItemsSource="{Binding StudentsTable}"
+                                  x:Name="StudentsTable">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border BorderBrush="#e0e0e0" 
+                                        BorderThickness="0,0,0,1"
+                                        Background="White"
+                                        Margin="0,0,0,1">
+                                    <Grid ColumnDefinitions="60,200,60,130,200,150,*"
+                                        MinHeight="40">
+                                        <Border Grid.Column="0" BorderBrush="#e0e0e0" BorderThickness="0,0,1,0"/>
+                                        <Border Grid.Column="1" BorderBrush="#e0e0e0" BorderThickness="0,0,1,0"/>
+                                        <Border Grid.Column="2" BorderBrush="#e0e0e0" BorderThickness="0,0,1,0"/>
+                                        <Border Grid.Column="3" BorderBrush="#e0e0e0" BorderThickness="0,0,1,0"/>
+                                        <Border Grid.Column="4" BorderBrush="#e0e0e0" BorderThickness="0,0,1,0"/>
+                                        <Border Grid.Column="5" BorderBrush="#e0e0e0" BorderThickness="0,0,1,0"/>
+                                        
+                                        <!-- № -->
+                                        <TextBlock Grid.Column="0" 
+                                                Text="{Binding RowNumber}" 
+                                                Foreground="#172f47" 
+                                                Padding="8" 
+                                                VerticalAlignment="Center"
+                                                HorizontalAlignment="Center"/>
+                                        
+                                        <!-- ПІБ -->
+                                        <TextBlock Grid.Column="1" 
+                                                Text="{Binding PersonalInfo.FullName}" 
+                                                Foreground="#172f47" 
+                                                Padding="8" 
+                                                VerticalAlignment="Center"
+                                                TextWrapping="Wrap"/>
+                                        
+                                        <!-- Курс -->
+                                        <TextBlock Grid.Column="2" 
+                                                Text="{Binding Year}" 
+                                                Foreground="#172f47" 
+                                                Padding="8" 
+                                                VerticalAlignment="Center"
+                                                HorizontalAlignment="Center"/>
+                                        
+                                        <!-- Середній бал -->
+                                        <TextBlock Grid.Column="3" 
+                                                Text="{Binding AverageGrade, StringFormat={}{0:F2}}" 
+                                                Foreground="#172f47" 
+                                                Padding="8" 
+                                                VerticalAlignment="Center"
+                                                HorizontalAlignment="Center"/>
+                                        
+                                        <!-- Факультет -->
+                                        <TextBlock Grid.Column="4" 
+                                                Text="{Binding PersonalInfo.Faculty}" 
+                                                Foreground="#172f47" 
+                                                Padding="8" 
+                                                VerticalAlignment="Center"
+                                                TextWrapping="Wrap"/>
+                                        
+                                        <!-- Кафедра -->
+                                        <TextBlock Grid.Column="5" 
+                                                Text="{Binding PersonalInfo.Department}" 
+                                                Foreground="#172f47" 
+                                                Padding="8" 
+                                                VerticalAlignment="Center"
+                                                TextWrapping="Wrap"/>
+                                        
+                                        <!-- Дисципліни -->
+                                        <TextBlock Grid.Column="6" 
+                                                Text="{Binding AllGradesDisplay}" 
+                                                Foreground="#172f47" 
+                                                Padding="8" 
+                                                VerticalAlignment="Center"
+                                                TextWrapping="Wrap"/>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    </StackPanel>
+                </ScrollViewer>
+            </Grid>
+        </Border>
+        
+        <!-- ПАНЕЛЬ ДІЙ -->
+        <Grid Grid.Row="3"
+              ColumnDefinitions="*,Auto"
+              Margin="15,15,0,0">
+            
+            <StackPanel Grid.Column="0"
+                        Orientation="Horizontal"
+                        Spacing="10"
+                        HorizontalAlignment="Left">
+                <Button Content="Очистити"
+                        Width="120"
+                        Height="36"
+                        Background="White"
+                        Foreground="#172f47"
+                        BorderBrush="#b0b0b0"
+                        BorderThickness="1"
+                        CornerRadius="6"
+                        FontSize="14"
+                        Padding="12,8"
+                        Cursor="Hand"
+                        HorizontalContentAlignment="Center"
+                        VerticalContentAlignment="Center"
+                        x:Name="BtnClear">
+                    <Button.Styles>
+                        <Style Selector="Button:pointerover /template/ ContentPresenter">
+                            <Setter Property="Background" Value="#172f47"/>
+                        </Style>
+                        <Style Selector="Button:pointerover">
+                            <Setter Property="Foreground" Value="White"/>
+                            <Setter Property="BorderBrush" Value="#172f47"/>
+                        </Style>
+                    </Button.Styles>
+                </Button>
+                <Button Content="HTML трансформація"
+                        Width="180"
+                        Height="36"
+                        Background="White"
+                        Foreground="#172f47"
+                        BorderBrush="#b0b0b0"
+                        BorderThickness="1"
+                        CornerRadius="6"
+                        FontSize="14"
+                        Padding="12,8"
+                        Cursor="Hand"
+                        HorizontalContentAlignment="Center"
+                        VerticalContentAlignment="Center"
+                        x:Name="BtnTransform">
+                    <Button.Styles>
+                        <Style Selector="Button:pointerover /template/ ContentPresenter">
+                            <Setter Property="Background" Value="#172f47"/>
+                        </Style>
+                        <Style Selector="Button:pointerover">
+                            <Setter Property="Foreground" Value="White"/>
+                            <Setter Property="BorderBrush" Value="#172f47"/>
+                        </Style>
+                    </Button.Styles>
+                </Button>
+            </StackPanel>
+            
+            <Button Grid.Column="1"
+                    Content="Вихід"
+                    Width="100"
+                    Height="36"
+                    Background="White"
+                    Foreground="#172f47"
+                    BorderBrush="#b0b0b0"
+                    BorderThickness="1"
+                    CornerRadius="6"
+                    FontSize="14"
+                    Padding="12,8"
+                    Cursor="Hand"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    x:Name="BtnExit">
+                <Button.Styles>
+                    <Style Selector="Button:pointerover /template/ ContentPresenter">
+                        <Setter Property="Background" Value="#172f47"/>
+                    </Style>
+                    <Style Selector="Button:pointerover">
+                        <Setter Property="Foreground" Value="White"/>
+                        <Setter Property="BorderBrush" Value="#172f47"/>
+                    </Style>
+                </Button.Styles>
+            </Button>
+        </Grid>
+        
+    </Grid>
+</Window>
