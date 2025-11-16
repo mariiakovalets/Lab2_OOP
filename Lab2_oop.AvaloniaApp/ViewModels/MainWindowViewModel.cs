@@ -11,12 +11,12 @@ namespace Lab2_oop.AvaloniaApp.ViewModels;
 
 public class MainWindowViewModel
 {
-    // Дані
+
     private string? _currentXmlFilePath;
     private IXmlParserStrategy? _currentStrategy;
     private List<Student> _currentFilteredStudents = new();
     
-    // UI Состояние
+
     public string FileName { get; set; } = "Файл не обрано";
     public ObservableCollection<Student> StudentsTable { get; set; } = new();
     public ObservableCollection<string> ParsingStrategies { get; set; } = new()
@@ -35,7 +35,7 @@ public class MainWindowViewModel
     
     public bool IsTableHeaderVisible { get; set; }
     
-    // Делегати для UI подій
+
     public Action<string>? ShowErrorAction;
     public Func<Task>? ShowExitConfirmationAction;
     public Func<Task<string?>>? ShowFileSaveDialogAction;
@@ -45,7 +45,7 @@ public class MainWindowViewModel
         Logger.Instance.Log("High", "ViewModel ініціалізовано");
     }
     
-    // ====== FILE OPERATIONS ======
+
     
     public void SetFilePath(string filePath)
     {
@@ -55,14 +55,12 @@ public class MainWindowViewModel
         
         Logger.Instance.Log("Medium", $"Обрано файл: {filePath}");
         
-        // Очищуємо попередні дані
         ClearSearchData();
         
-        // Завантажуємо атрибути
         LoadAttributesForFile();
     }
     
-    // ====== STRATEGY ======
+
     
     public void SelectStrategy(int index)
     {
@@ -90,7 +88,6 @@ public class MainWindowViewModel
         }
     }
     
-    // ====== ATTRIBUTES & VALUES ======
     
     private void LoadAttributesForFile()
     {
@@ -180,7 +177,6 @@ public class MainWindowViewModel
         }
     }
     
-    // ====== SEARCH ======
     
     public void Search()
     {
@@ -246,7 +242,6 @@ public class MainWindowViewModel
         }
     }
     
-    // ====== CLEAR ======
     
     public void Clear()
     {
@@ -267,7 +262,6 @@ public class MainWindowViewModel
         Logger.Instance.Log("Medium", "Дані очищені");
     }
     
-    // ====== HTML TRANSFORM ======
     
     public async Task TransformToHtml()
     {
