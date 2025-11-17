@@ -478,7 +478,7 @@
             </StackPanel>
             
             <Button Grid.Column="1"
-                    Content="Вихід"
+                    Content="Вийти"
                     Width="100"
                     Height="36"
                     Background="White"

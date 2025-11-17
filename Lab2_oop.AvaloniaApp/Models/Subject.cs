@@ -1,8 +1,5 @@
 namespace Lab2_oop.AvaloniaApp.Models;
 
-/// <summary>
-/// Навчальна дисципліна студента
-/// </summary>
 public class Subject
 {
 
