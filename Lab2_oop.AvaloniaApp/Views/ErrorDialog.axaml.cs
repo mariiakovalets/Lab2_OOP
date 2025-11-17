@@ -5,6 +5,8 @@ namespace Lab2_oop.AvaloniaApp.Views;
 
 public partial class ErrorDialog : Window
 {
+    public ErrorDialog() : this("") { }
+
     public ErrorDialog(string message)
     {
         InitializeComponent();

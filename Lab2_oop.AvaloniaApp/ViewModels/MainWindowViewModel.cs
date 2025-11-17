@@ -102,7 +102,7 @@ public class MainWindowViewModel
         
         var translations = new Dictionary<string, string>
         {
-            { "FullName", "П.І.П." },
+            { "FullName", "ПІБ" },
             { "year", "Курс" },
             { "Faculty", "Факультет" },
             { "Department", "Кафедра" },

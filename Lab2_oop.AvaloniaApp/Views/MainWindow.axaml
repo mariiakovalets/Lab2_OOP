@@ -245,7 +245,7 @@
     </StackPanel>
     
     <StackPanel Spacing="8">
-        <TextBlock Text="Виберіть значення"
+        <TextBlock Text="Виберіть критерій фільтру"
                    FontSize="14"
                    FontWeight="SemiBold"
                    Foreground="#172f47"/>
@@ -268,7 +268,7 @@
         <TextBlock Text=" "
                    FontSize="14"
                    FontWeight="SemiBold"/>
-        <Button Content="Показати"
+        <Button Content="Шукати"
                 Width="180"
                 Height="40"
                 Background="White"
@@ -451,7 +451,7 @@
                         </Style>
                     </Button.Styles>
                 </Button>
-                <Button Content="HTML трансформація"
+                <Button Content="Експортувати в HTML"
                         Width="180"
                         Height="36"
                         Background="White"
