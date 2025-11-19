@@ -109,55 +109,52 @@ public class SAXParsingStrategy : IXmlParserStrategy
         return students;
     }
     
-    /// <summary>
-    /// Отримує доступні атрибути з XML файлу
-    /// </summary>
-    public List<string> GetAvailableAttributes(string xmlPath)
+
+public List<string> GetAvailableAttributes(string xmlPath)
+{
+    var attributes = new HashSet<string>();
+    
+    try
     {
-        var attributes = new HashSet<string>();
-        
-        try
+        using (XmlReader reader = XmlReader.Create(xmlPath))
         {
-            using (XmlReader reader = XmlReader.Create(xmlPath))
+            while (reader.Read())
             {
-                while (reader.Read())
+                if (reader.NodeType == XmlNodeType.Element && reader.Name == "Student")
                 {
-                    if (reader.NodeType == XmlNodeType.Element && reader.Name == "Student")
+                    if (reader.HasAttributes)
                     {
-                        if (reader.HasAttributes)
+                        for (int i = 0; i < reader.AttributeCount; i++)
                         {
-                            for (int i = 0; i < reader.AttributeCount; i++)
+                            reader.MoveToAttribute(i);
+                            
+                            if (reader.Name == "year")
                             {
-                                reader.MoveToAttribute(i);
                                 attributes.Add(reader.Name);
                             }
-                            reader.MoveToElement();
                         }
+                        reader.MoveToElement();
                     }
                 }
             }
-            
-            // Додаємо поля з PersonalInfo
-            attributes.Add("FullName");
-            attributes.Add("Faculty");
-            attributes.Add("Department");
-            
-            // Додаємо Subject
-            attributes.Add("Subject");
-            
-            Logger.Instance.Log("Low", $"SAX: знайдено {attributes.Count} атрибутів");
-        }
-        catch (Exception ex)
-        {
-            Logger.Instance.Error($"Помилка читання атрибутів SAX: {ex.Message}");
         }
         
-        return attributes.OrderBy(a => a).ToList();
+        attributes.Add("FullName");
+        attributes.Add("Faculty");
+        attributes.Add("Department");
+        
+        attributes.Add("Subject");
+        
+        Logger.Instance.Log("Low", $"SAX: знайдено {attributes.Count} атрибутів");
+    }
+    catch (Exception ex)
+    {
+        Logger.Instance.Error($"Помилка читання атрибутів SAX: {ex.Message}");
     }
     
-    /// <summary>
-    /// Перевіряє чи відповідає студент критерію пошуку
-    /// </summary>
+    return attributes.OrderBy(a => a).ToList();
+}
+    
     private bool MatchesSearchCriteria(Student student, string searchAttribute, string searchValue)
     {
         if (string.IsNullOrWhiteSpace(searchValue))
@@ -176,9 +173,6 @@ public class SAXParsingStrategy : IXmlParserStrategy
         };
     }
     
-    /// <summary>
-    /// Допоміжний метод для парсингу nullable int
-    /// </summary>
     private int? ParseNullableInt(string? value)
     {
         if (string.IsNullOrWhiteSpace(value))

@@ -74,15 +74,16 @@ public class DOMParsingStrategy : IXmlParserStrategy
                 {
                     foreach (XmlAttribute attr in student.Attributes)
                     {
-                        attributes.Add(attr.Name);
+                        if (attr.Name == "year")
+                        {
+                            attributes.Add(attr.Name);
+                        }
                     }
                 }
             }
-            
             attributes.Add("FullName");
             attributes.Add("Faculty");
             attributes.Add("Department");
-            
             attributes.Add("Subject");
             
             Logger.Instance.Log("Low", $"DOM: знайдено {attributes.Count} атрибутів");

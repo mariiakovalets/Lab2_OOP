@@ -2,22 +2,62 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using Lab2_oop.AvaloniaApp.Models;
 using Lab2_oop.AvaloniaApp.Parsers;
+using Lab2_oop.AvaloniaApp.Saver;
 using Lab2_oop.AvaloniaApp.LogLibrary;
 using System.Threading.Tasks;
 
 namespace Lab2_oop.AvaloniaApp.ViewModels;
 
-public class MainWindowViewModel
+public class MainWindowViewModel : INotifyPropertyChanged
 {
-
+    // ========== INotifyPropertyChanged ==========
+    public event PropertyChangedEventHandler? PropertyChanged;
+    
+    protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+    
+    // ========== ПРИВАТНІ ПОЛЯ ==========
     private string? _currentXmlFilePath;
     private IXmlParserStrategy? _currentStrategy;
     private List<Student> _currentFilteredStudents = new();
     
-
-    public string FileName { get; set; } = "Файл не обрано";
+    private string _fileName = "Файл не обрано";
+    private bool _isTableHeaderVisible;
+    
+    // ========== ПУБЛІЧНІ ВЛАСТИВОСТІ ==========
+    
+    public string FileName
+    {
+        get => _fileName;
+        set
+        {
+            if (_fileName != value)
+            {
+                _fileName = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+    
+    public bool IsTableHeaderVisible
+    {
+        get => _isTableHeaderVisible;
+        set
+        {
+            if (_isTableHeaderVisible != value)
+            {
+                _isTableHeaderVisible = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+    
     public ObservableCollection<Student> StudentsTable { get; set; } = new();
     public ObservableCollection<string> ParsingStrategies { get; set; } = new()
     {
@@ -33,19 +73,18 @@ public class MainWindowViewModel
     public int SelectedAttributeIndex { get; set; } = -1;
     public int SelectedValueIndex { get; set; } = -1;
     
-    public bool IsTableHeaderVisible { get; set; }
-    
-
+    // ========== ACTIONS ==========
     public Action<string>? ShowErrorAction;
     public Func<Task>? ShowExitConfirmationAction;
     public Func<Task<string?>>? ShowFileSaveDialogAction;
     
+    // ========== КОНСТРУКТОР ==========
     public MainWindowViewModel()
     {
         Logger.Instance.Log("High", "ViewModel ініціалізовано");
     }
     
-
+    // ========== МЕТОДИ ==========
     
     public void SetFilePath(string filePath)
     {
@@ -56,11 +95,8 @@ public class MainWindowViewModel
         Logger.Instance.Log("Medium", $"Обрано файл: {filePath}");
         
         ClearSearchData();
-        
         LoadAttributesForFile();
     }
-    
-
     
     public void SelectStrategy(int index)
     {
@@ -87,7 +123,6 @@ public class MainWindowViewModel
             Logger.Instance.Log("Low", $"Вибрана стратегія: {_currentStrategy.StrategyName}");
         }
     }
-    
     
     private void LoadAttributesForFile()
     {
@@ -177,7 +212,6 @@ public class MainWindowViewModel
         }
     }
     
-    
     public void Search()
     {
         if (string.IsNullOrEmpty(_currentXmlFilePath))
@@ -242,7 +276,6 @@ public class MainWindowViewModel
         }
     }
     
-    
     public void Clear()
     {
         _currentXmlFilePath = null;
@@ -262,7 +295,6 @@ public class MainWindowViewModel
         Logger.Instance.Log("Medium", "Дані очищені");
     }
     
-    
     public async Task TransformToHtml()
     {
         if (string.IsNullOrEmpty(_currentXmlFilePath))
@@ -279,13 +311,6 @@ public class MainWindowViewModel
         
         try
         {
-            string tempXmlPath = System.IO.Path.Combine(
-                System.IO.Path.GetTempPath(),
-                $"filtered_students_{Guid.NewGuid()}.xml"
-            );
-            
-            CreateFilteredXml(_currentFilteredStudents, tempXmlPath);
-            
             string xmlDirectory = System.IO.Path.GetDirectoryName(_currentXmlFilePath) ?? "";
             string xslPath = System.IO.Path.Combine(xmlDirectory, "students.xsl");
             
@@ -304,16 +329,12 @@ public class MainWindowViewModel
             
             if (string.IsNullOrEmpty(outputPath))
             {
-                if (System.IO.File.Exists(tempXmlPath))
-                    System.IO.File.Delete(tempXmlPath);
                 return;
             }
             
-            var htmlSaver = new Saver.HtmlSaver();
-            bool success = htmlSaver.TransformToHtml(tempXmlPath, xslPath, outputPath);
-            
-            if (System.IO.File.Exists(tempXmlPath))
-                System.IO.File.Delete(tempXmlPath);
+            // Використовуємо новий інтерфейс ISaver
+            var htmlSaver = new HtmlSaver();
+            bool success = htmlSaver.Save(_currentFilteredStudents, outputPath, xslPath);
             
             if (success)
             {
@@ -342,40 +363,9 @@ public class MainWindowViewModel
         }
     }
     
-    private void CreateFilteredXml(List<Student> students, string outputPath)
-    {
-        var xDoc = new System.Xml.Linq.XDocument(
-            new System.Xml.Linq.XDeclaration("1.0", "utf-8", null),
-            new System.Xml.Linq.XElement("Students",
-                students.Select(student =>
-                    new System.Xml.Linq.XElement("Student",
-                        new System.Xml.Linq.XAttribute("averageGrade", student.AverageGrade.ToString("F2")),
-                        student.Year.HasValue ? new System.Xml.Linq.XAttribute("year", student.Year.Value) : null,
-                        
-                        new System.Xml.Linq.XElement("PersonalInfo",
-                            new System.Xml.Linq.XElement("FullName", student.PersonalInfo.FullName),
-                            new System.Xml.Linq.XElement("Faculty", student.PersonalInfo.Faculty),
-                            new System.Xml.Linq.XElement("Department", student.PersonalInfo.Department)
-                        ),
-                        
-                        new System.Xml.Linq.XElement("Subjects",
-                            student.Subjects.Select(subject =>
-                                new System.Xml.Linq.XElement("Subject",
-                                    new System.Xml.Linq.XElement("Name", subject.Name),
-                                    new System.Xml.Linq.XElement("Grade", subject.Grade)
-                                )
-                            )
-                        )
-                    )
-                )
-            )
-        );
-        
-        xDoc.Save(outputPath);
-    }
-    
     private void ClearSearchData()
     {
+        _currentStrategy = null;
         SelectedStrategyIndex = -1;
         SelectedAttributeIndex = -1;
         SelectedValueIndex = -1;

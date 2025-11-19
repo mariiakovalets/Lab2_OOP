@@ -3,7 +3,6 @@ using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 
 namespace Lab2_oop.AvaloniaApp.Views;
-
 public partial class ExitConfirmationDialog : Window
 {
     public bool Result { get; private set; }

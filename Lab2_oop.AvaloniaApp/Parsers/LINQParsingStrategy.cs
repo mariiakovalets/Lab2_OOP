@@ -58,14 +58,20 @@ public class LINQParsingStrategy : IXmlParserStrategy
                 foreach (var attr in student.Attributes())
                 {
                     string attrName = attr.Name.LocalName;
-                    attributes.Add(attrName);
+                    
+                    if (attrName == "year")
+                    {
+                        attributes.Add(attrName);
+                    }
                 }
             }
             
+            // PersonalInfo поля
             attributes.Add("FullName");
             attributes.Add("Faculty");
             attributes.Add("Department");
             
+            // Subject
             attributes.Add("Subject");
             
             Logger.Instance.Log("Low", $"LINQ: знайдено {attributes.Count} атрибутів");

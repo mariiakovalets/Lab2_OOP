@@ -5,12 +5,9 @@ namespace Lab2_oop.AvaloniaApp.Models;
 
 public class Student
 {
-
-
     public int RowNumber { get; set; }
     
     public int? Year { get; set; }
-    
 
     public PersonalInfo PersonalInfo { get; set; } = new PersonalInfo();
     
@@ -18,21 +15,23 @@ public class Student
     
 
     public double AverageGrade
+{
+    get
     {
-        get
+        if (Subjects.Count == 0) return 0;
+        
+        double sum = 0;
+        foreach (var subject in Subjects)
         {
-            if (Subjects.Count == 0) return 0;
-            
-            double sum = 0;
-            foreach (var subject in Subjects)
+            if (double.TryParse(subject.Grade, out var grade))
             {
-                sum += ConvertGradeToNumber(subject.Grade);
+                sum += grade;
             }
-            return sum / Subjects.Count;
         }
+        return sum / Subjects.Count;
     }
-    
- 
+}
+
     public string AllGradesDisplay
     {
         get
@@ -45,19 +44,6 @@ public class Student
         }
     }
     
-
-    private double ConvertGradeToNumber(string grade)
-    {
-        return grade.ToUpper() switch
-        {
-            "A" or "ВІДМІННО" => 100,
-            "B" or "ДОБРЕ" => 85,
-            "C" or "ЗАДОВІЛЬНО" => 70,
-            "D" or "ДОСТАТНЬО" => 60,
-            "F" or "НЕЗАДОВІЛЬНО" => 0,
-            _ => double.TryParse(grade, out var numGrade) ? numGrade : 0
-        };
-    } 
     
     public override string ToString()
     {

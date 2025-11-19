@@ -53,6 +53,7 @@ public partial class MainWindow : Window
             if (files.Count > 0)
             {
                 _viewModel.SetFilePath(files[0].Path.LocalPath);
+                CmbParsingStrategy.SelectedIndex = -1;
                 
                 var table = this.FindControl<ItemsControl>("StudentsTable");
                 if (table != null)
@@ -75,12 +76,17 @@ public partial class MainWindow : Window
     }
     
     private void CmbParsingStrategy_SelectionChanged(object? sender, SelectionChangedEventArgs e)
+{
+    if (CmbParsingStrategy.SelectedIndex >= 0)
     {
-        if (CmbParsingStrategy.SelectedIndex >= 0)
+        _viewModel.SelectStrategy(CmbParsingStrategy.SelectedIndex);
+        
+        if (_viewModel.SearchAttributes.Count > 0)
         {
-            _viewModel.SelectStrategy(CmbParsingStrategy.SelectedIndex);
+            CmbSearchAttribute.SelectedIndex = 0;
         }
     }
+}
     
     private void CmbSearchAttribute_SelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
@@ -100,7 +106,6 @@ public partial class MainWindow : Window
             header.IsVisible = _viewModel.IsTableHeaderVisible;
         }
     }
-    
     private void BtnClear_Click(object? sender, RoutedEventArgs e)
     {
         _viewModel.Clear();
