@@ -35,12 +35,9 @@ public class LINQParsingStrategy : IXmlParserStrategy
             }
         }
         
-        attributes.Add("FullName");
-        attributes.Add("Subject");
-        
         return attributes.OrderBy(a => a).ToList();
     }
-    
+
     
     private Student ParseStudent(XElement el)
     {

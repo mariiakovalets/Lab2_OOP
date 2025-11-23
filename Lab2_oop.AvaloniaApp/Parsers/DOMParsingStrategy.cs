@@ -48,13 +48,9 @@ public class DOMParsingStrategy : IXmlParserStrategy
             }
         }
         
-        attributes.Add("FullName");
-        attributes.Add("Subject");
-        
         return attributes.OrderBy(a => a).ToList();
     }
     
-    // ========== PRIVATE ==========
     
     private Student ParseStudent(XmlNode node)
     {
@@ -63,21 +59,17 @@ public class DOMParsingStrategy : IXmlParserStrategy
             Year = ParseNullableInt(node.Attributes?["year"]?.Value)
         };
         
-        // Спочатку читаємо з атрибутів
         student.Faculty = node.Attributes?["faculty"]?.Value ?? "";
         student.Department = node.Attributes?["department"]?.Value ?? "";
         
-        // Потім читаємо PersonalInfo (якщо атрибутів не було)
         var personalInfo = node.SelectSingleNode("PersonalInfo");
         if (personalInfo != null)
         {
             student.FullName = personalInfo.SelectSingleNode("FullName")?.InnerText ?? "";
             
-            // Якщо факультет не був в атрибутах - беремо з елемента
             if (string.IsNullOrEmpty(student.Faculty))
                 student.Faculty = personalInfo.SelectSingleNode("Faculty")?.InnerText ?? "";
             
-            // Якщо кафедра не була в атрибутах - беремо з елемента
             if (string.IsNullOrEmpty(student.Department))
                 student.Department = personalInfo.SelectSingleNode("Department")?.InnerText ?? "";
         }

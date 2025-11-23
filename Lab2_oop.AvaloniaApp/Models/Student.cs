@@ -9,7 +9,6 @@ public class Student
     
     public int? Year { get; set; }
     
-    // Особиста інформація (раніше PersonalInfo)
     public string FullName { get; set; } = string.Empty;
     public string Faculty { get; set; } = string.Empty;
     public string Department { get; set; } = string.Empty;

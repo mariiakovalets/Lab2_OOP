@@ -51,10 +51,12 @@ public class SAXParsingStrategy : IXmlParserStrategy
                                 currentStudent.FullName = reader.Value;
                                 break;
                             case "Faculty":
+                                // Якщо Faculty не було в атрибутах - беремо з елемента
                                 if (string.IsNullOrEmpty(currentStudent.Faculty))
                                     currentStudent.Faculty = reader.Value;
                                 break;
                             case "Department":
+                                // Якщо Department не було в атрибутах - беремо з елемента
                                 if (string.IsNullOrEmpty(currentStudent.Department))
                                     currentStudent.Department = reader.Value;
                                 break;
@@ -112,9 +114,6 @@ public class SAXParsingStrategy : IXmlParserStrategy
             }
         }
         
-        attributes.Add("FullName");
-        attributes.Add("Subject");
-        
         return attributes.OrderBy(a => a).ToList();
     }
     
@@ -136,6 +135,7 @@ public class SAXParsingStrategy : IXmlParserStrategy
             _ => false
         };
     }
+    
     private int? ParseNullableInt(string? value)
     {
         return int.TryParse(value, out var result) ? result : null;

@@ -100,9 +100,10 @@ public class MainWindowViewModel : INotifyPropertyChanged
     public int SelectedAttributeIndex { get; set; } = -1;
     public int SelectedValueIndex { get; set; } = -1;
     
+    // ========== ACTIONS ==========
     public Action<string>? ShowErrorAction;
     public Func<Task<string?>>? ShowFileSaveDialogAction;
-    
+
     public MainWindowViewModel()
     {
         _searchService = new StudentSearchService();
@@ -161,13 +162,11 @@ public class MainWindowViewModel : INotifyPropertyChanged
         SearchAttributes.Add(new { Display = "всі студенти", Tag = "" });
         
         var translations = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
-{
-    { "FullName", "ПІБ" },
-    { "year", "Курс" },
-    { "faculty", "Факультет" },
-    { "department", "Кафедра" },
-    { "Subject", "Дисципліна" }
-};
+        {
+            { "year", "Курс" },
+            { "faculty", "Факультет" },
+            { "department", "Кафедра" }
+        };
         
         foreach (var attr in attributes)
         {
@@ -333,7 +332,7 @@ public class MainWindowViewModel : INotifyPropertyChanged
         
         if (_currentFilteredStudents == null || _currentFilteredStudents.Count == 0)
         {
-            ShowErrorAction?.Invoke("Немає даних для трансформації!");
+            ShowErrorAction?.Invoke("Немає даних для трансформації! Натисніть 'Шукати' спочатку.");
             return;
         }
         
@@ -385,6 +384,7 @@ public class MainWindowViewModel : INotifyPropertyChanged
             ShowErrorAction?.Invoke($"Помилка: {ex.Message}");
         }
     }
+    
     private void ClearSearchData()
     {
         _currentStrategy = null;
