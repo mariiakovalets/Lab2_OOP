@@ -14,20 +14,16 @@ public static class XmlGenerator
             new XElement("Students",
                 students.Select(student => 
                     new XElement("Student",
-                        // Атрибути (якщо є значення)
                         student.Year.HasValue ? new XAttribute("year", student.Year.Value) : null,
                         !string.IsNullOrEmpty(student.Faculty) ? new XAttribute("faculty", student.Faculty) : null,
                         !string.IsNullOrEmpty(student.Department) ? new XAttribute("department", student.Department) : null,
                         new XAttribute("averageGrade", student.AverageGrade.ToString("F2", CultureInfo.InvariantCulture)),
                         
-                        // Особиста інформація
                         new XElement("PersonalInfo",
                             new XElement("FullName", student.FullName),
                             new XElement("Faculty", student.Faculty ?? ""),
                             new XElement("Department", student.Department ?? "")
                         ),
-                        
-                        // Дисципліни
                         new XElement("Subjects",
                             student.Subjects.Select(subject =>
                                 new XElement("Subject",

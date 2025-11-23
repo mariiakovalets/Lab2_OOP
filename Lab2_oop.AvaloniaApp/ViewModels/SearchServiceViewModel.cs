@@ -8,6 +8,7 @@ namespace Lab2_oop.AvaloniaApp.ViewModels;
 
 public class StudentSearchService
 {
+   
     public List<Student> Search(
         string xmlPath,
         IXmlParserStrategy strategy,
@@ -16,6 +17,7 @@ public class StudentSearchService
         string? keyword)
     {
         var results = strategy.ParseStudents(xmlPath, searchAttribute, searchValue);
+        
         if (!string.IsNullOrWhiteSpace(keyword))
         {
             results = FilterByKeyword(results, keyword);
@@ -27,6 +29,8 @@ public class StudentSearchService
         
         return results;
     }
+    
+
     private List<Student> FilterByKeyword(List<Student> students, string keyword)
     {
         string keywordLower = keyword.ToLower();
@@ -36,11 +40,13 @@ public class StudentSearchService
             s.Faculty.ToLower().Contains(keywordLower) ||
             s.Department.ToLower().Contains(keywordLower) ||
             s.Year?.ToString().Contains(keywordLower) == true ||
+            s.AverageGrade.ToString("F2").Contains(keywordLower) || 
             s.Subjects.Any(subj => 
                 subj.Name.ToLower().Contains(keywordLower) || 
-                subj.Grade.ToLower().Contains(keywordLower))
+                subj.Grade.Contains(keywordLower)) 
         ).ToList();
     }
+    
     
     private void AssignRowNumbers(List<Student> students)
     {
