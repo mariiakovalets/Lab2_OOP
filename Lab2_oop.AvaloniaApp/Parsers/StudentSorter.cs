@@ -8,6 +8,9 @@ public static class StudentSorter
 {
     public static List<Student> SortByAverageGrade(List<Student> students)
     {
-        return students.OrderByDescending(s => s.AverageGrade).ToList();
+        return students
+            .OrderByDescending(s => s.AverageGrade)  
+            .ThenBy(s => s.FullName)                 
+            .ToList();
     }
 }
