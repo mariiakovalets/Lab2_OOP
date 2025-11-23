@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 using Lab2_oop.AvaloniaApp.Models;
-using Lab2_oop.AvaloniaApp.LogLibrary;
 
 namespace Lab2_oop.AvaloniaApp.Parsers;
 
@@ -13,113 +12,64 @@ public class LINQParsingStrategy : IXmlParserStrategy
     
     public List<Student> ParseStudents(string xmlPath, string searchAttribute, string searchValue)
     {
-        Logger.Instance.Log("Low", $"LINQ парсинг розпочато | Атрибут: {searchAttribute} | Значення: {searchValue}");
+        var doc = XDocument.Load(xmlPath);
+        var students = doc.Descendants("Student").Select(ParseStudent).ToList();
         
-        var students = new List<Student>();
+        if (string.IsNullOrWhiteSpace(searchValue))
+            return students;
         
-        try
-        {
-            XDocument doc = XDocument.Load(xmlPath);
-            
-            var studentElements = doc.Descendants("Student");
-            
-            foreach (var studentElement in studentElements)
-            {
-                var student = ParseStudentElement(studentElement);
-                
-                if (string.IsNullOrWhiteSpace(searchValue) || MatchesSearchCriteria(student, searchAttribute, searchValue))
-                {
-                    students.Add(student);
-                }
-            }
-            
-            Logger.Instance.Log("Low", $"LINQ парсинг завершено | Знайдено: {students.Count} студент(ів)");
-        }
-        catch (Exception ex)
-        {
-            Logger.Instance.Error($"Помилка LINQ парсингу: {ex.Message}");
-        }
-        
-        return students;
+        return students.Where(s => MatchesSearchCriteria(s, searchAttribute, searchValue)).ToList();
     }
     
     public List<string> GetAvailableAttributes(string xmlPath)
     {
         var attributes = new HashSet<string>();
         
-        try
+        var doc = XDocument.Load(xmlPath);
+        
+        foreach (var student in doc.Descendants("Student"))
         {
-            XDocument doc = XDocument.Load(xmlPath);
-            
-            var students = doc.Descendants("Student");
-            
-            foreach (var student in students)
+            foreach (var attr in student.Attributes())
             {
-                foreach (var attr in student.Attributes())
-                {
-                    string attrName = attr.Name.LocalName;
-                    
-                    if (attrName == "year")
-                    {
-                        attributes.Add(attrName);
-                    }
-                }
+                attributes.Add(attr.Name.LocalName);
             }
-            
-            // PersonalInfo поля
-            attributes.Add("FullName");
-            attributes.Add("Faculty");
-            attributes.Add("Department");
-            
-            // Subject
-            attributes.Add("Subject");
-            
-            Logger.Instance.Log("Low", $"LINQ: знайдено {attributes.Count} атрибутів");
         }
-        catch (Exception ex)
-        {
-            Logger.Instance.Error($"Помилка читання атрибутів LINQ: {ex.Message}");
-        }
+        
+        attributes.Add("FullName");
+        attributes.Add("Subject");
         
         return attributes.OrderBy(a => a).ToList();
     }
     
-
-    private Student ParseStudentElement(XElement studentElement)
+    
+    private Student ParseStudent(XElement el)
     {
-        var student = new Student
-        {
-            Year = ParseNullableInt(studentElement.Attribute("year")?.Value)
-        };
+        var personalInfo = el.Element("PersonalInfo");
         
-
-        var personalInfoElement = studentElement.Element("PersonalInfo");
-        if (personalInfoElement != null)
-        {
-            student.PersonalInfo = new PersonalInfo
-            {
-                FullName = personalInfoElement.Element("FullName")?.Value ?? "",
-                Faculty = personalInfoElement.Element("Faculty")?.Value ?? "",
-                Department = personalInfoElement.Element("Department")?.Value ?? ""
-            };
-        }
+        string faculty = el.Attribute("faculty")?.Value ?? "";
+        string department = el.Attribute("department")?.Value ?? "";
         
-        var subjectsElement = studentElement.Element("Subjects");
-        if (subjectsElement != null)
+        if (string.IsNullOrEmpty(faculty))
+            faculty = personalInfo?.Element("Faculty")?.Value ?? "";
+        
+        if (string.IsNullOrEmpty(department))
+            department = personalInfo?.Element("Department")?.Value ?? "";
+        
+        return new Student
         {
-            foreach (var subjectElement in subjectsElement.Elements("Subject"))
-            {
-                var subject = new Subject
+            Year = (int?)el.Attribute("year"),
+            FullName = personalInfo?.Element("FullName")?.Value ?? "",
+            Faculty = faculty,
+            Department = department,
+            Subjects = el.Element("Subjects")?
+                .Elements("Subject")
+                .Select(s => new Subject
                 {
-                    Name = subjectElement.Element("Name")?.Value ?? "",
-                    Grade = subjectElement.Element("Grade")?.Value ?? ""
-                };
-                
-                student.Subjects.Add(subject);
-            }
-        }
-        
-        return student;
+                    Name = s.Element("Name")?.Value ?? "",
+                    Grade = s.Element("Grade")?.Value ?? ""
+                })
+                .ToList() ?? new List<Subject>()
+        };
     }
     
     private bool MatchesSearchCriteria(Student student, string searchAttribute, string searchValue)
@@ -132,19 +82,11 @@ public class LINQParsingStrategy : IXmlParserStrategy
         return searchAttribute.ToLower() switch
         {
             "year" => student.Year?.ToString().Contains(searchValue) ?? false,
-            "fullname" => student.PersonalInfo.FullName.ToLower().Contains(searchValue),
-            "faculty" => student.PersonalInfo.Faculty.ToLower().Contains(searchValue),
-            "department" => student.PersonalInfo.Department.ToLower().Contains(searchValue),
+            "fullname" => student.FullName.ToLower().Contains(searchValue),
+            "faculty" => student.Faculty.ToLower().Contains(searchValue),
+            "department" => student.Department.ToLower().Contains(searchValue),
             "subject" => student.Subjects.Any(s => s.Name.ToLower().Contains(searchValue)),
             _ => false
         };
-    }
-    
-    private int? ParseNullableInt(string? value)
-    {
-        if (string.IsNullOrWhiteSpace(value))
-            return null;
-        
-        return int.TryParse(value, out var result) ? result : null;
     }
 }

@@ -2,8 +2,8 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using System;
+using System.IO;
 using System.Threading.Tasks;
-using Lab2_oop.AvaloniaApp.Views;
 using Lab2_oop.AvaloniaApp.ViewModels;
 using Lab2_oop.AvaloniaApp.LogLibrary;
 
@@ -11,7 +11,7 @@ namespace Lab2_oop.AvaloniaApp.Views;
 
 public partial class MainWindow : Window
 {
-    private MainWindowViewModel _viewModel;
+    private readonly MainWindowViewModel _viewModel;
     
     public MainWindow()
     {
@@ -20,7 +20,8 @@ public partial class MainWindow : Window
         _viewModel = new MainWindowViewModel();
         DataContext = _viewModel;
         
-        Logger.Instance.Log("High", "Програма запущена");
+        _viewModel.ShowErrorAction = ShowError;
+        _viewModel.ShowFileSaveDialogAction = ShowFileSaveDialog;
         
         BtnSelectFile.Click += BtnSelectFile_Click;
         BtnSearch.Click += BtnSearch_Click;
@@ -31,9 +32,9 @@ public partial class MainWindow : Window
         CmbParsingStrategy.SelectionChanged += CmbParsingStrategy_SelectionChanged;
         CmbSearchAttribute.SelectionChanged += CmbSearchAttribute_SelectionChanged;
         
-        _viewModel.ShowErrorAction = ShowError;
-        _viewModel.ShowFileSaveDialogAction = ShowFileSaveDialog;
+        Logger.Instance.Log("High", "Програма запущена");
     }
+    
     
     private async void BtnSelectFile_Click(object? sender, RoutedEventArgs e)
     {
@@ -52,20 +53,12 @@ public partial class MainWindow : Window
             
             if (files.Count > 0)
             {
-                _viewModel.SetFilePath(files[0].Path.LocalPath);
+                string filePath = files[0].Path.LocalPath;
+                _viewModel.SetFilePath(filePath);
+                
+                Logger.Instance.Log("High", $"Обрано файл: {Path.GetFileName(filePath)}");
+                
                 CmbParsingStrategy.SelectedIndex = -1;
-                
-                var table = this.FindControl<ItemsControl>("StudentsTable");
-                if (table != null)
-                {
-                    table.ItemsSource = _viewModel.StudentsTable;
-                }
-                
-                var header = this.FindControl<Grid>("TableHeader");
-                if (header != null)
-                {
-                    header.IsVisible = _viewModel.IsTableHeaderVisible;
-                }
             }
         }
         catch (Exception ex)
@@ -76,17 +69,17 @@ public partial class MainWindow : Window
     }
     
     private void CmbParsingStrategy_SelectionChanged(object? sender, SelectionChangedEventArgs e)
-{
-    if (CmbParsingStrategy.SelectedIndex >= 0)
     {
-        _viewModel.SelectStrategy(CmbParsingStrategy.SelectedIndex);
-        
-        if (_viewModel.SearchAttributes.Count > 0)
+        if (CmbParsingStrategy.SelectedIndex >= 0)
         {
-            CmbSearchAttribute.SelectedIndex = 0;
+            _viewModel.SelectStrategy(CmbParsingStrategy.SelectedIndex);
+            
+            if (_viewModel.SearchAttributes.Count > 0)
+            {
+                CmbSearchAttribute.SelectedIndex = 0;
+            }
         }
     }
-}
     
     private void CmbSearchAttribute_SelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
@@ -99,26 +92,20 @@ public partial class MainWindow : Window
     private void BtnSearch_Click(object? sender, RoutedEventArgs e)
     {
         _viewModel.Search();
-        
-        var header = this.FindControl<Grid>("TableHeader");
-        if (header != null)
-        {
-            header.IsVisible = _viewModel.IsTableHeaderVisible;
-        }
     }
+    
     private void BtnClear_Click(object? sender, RoutedEventArgs e)
     {
         _viewModel.Clear();
-        
+
         CmbParsingStrategy.SelectedIndex = -1;
         CmbSearchAttribute.SelectedIndex = -1;
         CmbSearchValue.SelectedIndex = -1;
         
-        var header = this.FindControl<Grid>("TableHeader");
-        if (header != null)
-        {
-            header.IsVisible = false;
-        }
+        if (TxtKeyword != null)
+            TxtKeyword.Text = string.Empty;
+        
+        Logger.Instance.Log("Low", "UI очищено");
     }
     
     private async void BtnTransform_Click(object? sender, RoutedEventArgs e)
@@ -145,6 +132,7 @@ public partial class MainWindow : Window
             Environment.Exit(0);
         }
     }
+    
     
     private async void ShowError(string message)
     {

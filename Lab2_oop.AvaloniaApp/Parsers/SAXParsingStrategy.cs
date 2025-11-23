@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
 using Lab2_oop.AvaloniaApp.Models;
-using Lab2_oop.AvaloniaApp.LogLibrary;
 
 namespace Lab2_oop.AvaloniaApp.Parsers;
 
@@ -13,109 +12,87 @@ public class SAXParsingStrategy : IXmlParserStrategy
     
     public List<Student> ParseStudents(string xmlPath, string searchAttribute, string searchValue)
     {
-        Logger.Instance.Log("Low", $"SAX парсинг розпочато | Атрибут: {searchAttribute} | Значення: {searchValue}");
-        
         var students = new List<Student>();
         
-        try
+        using (XmlReader reader = XmlReader.Create(xmlPath))
         {
-            using (XmlReader reader = XmlReader.Create(xmlPath))
+            Student? currentStudent = null;
+            Subject? currentSubject = null;
+            string? currentElement = null;
+            
+            while (reader.Read())
             {
-                Student? currentStudent = null;
-                PersonalInfo? currentPersonalInfo = null;
-                Subject? currentSubject = null;
-                string? currentElement = null;
-                
-                while (reader.Read())
+                switch (reader.NodeType)
                 {
-                    switch (reader.NodeType)
-                    {
-                        case XmlNodeType.Element:
-                            currentElement = reader.Name;
-                            
-                            if (reader.Name == "Student")
-                            {
-                                currentStudent = new Student();
-                                
-                                if (reader.HasAttributes)
-                                {
-                                    currentStudent.Year = ParseNullableInt(reader.GetAttribute("year"));
-                                }
-                            }
-                            else if (reader.Name == "PersonalInfo")
-                            {
-                                currentPersonalInfo = new PersonalInfo();
-                            }
-                            else if (reader.Name == "Subject")
-                            {
-                                currentSubject = new Subject();
-                            }
-                            break;
+                    case XmlNodeType.Element:
+                        currentElement = reader.Name;
                         
-                        case XmlNodeType.Text:
-                            if (currentElement == "FullName" && currentPersonalInfo != null)
+                        if (reader.Name == "Student")
+                        {
+                            currentStudent = new Student
                             {
-                                currentPersonalInfo.FullName = reader.Value;
-                            }
-                            else if (currentElement == "Faculty" && currentPersonalInfo != null)
-                            {
-                                currentPersonalInfo.Faculty = reader.Value;
-                            }
-                            else if (currentElement == "Department" && currentPersonalInfo != null)
-                            {
-                                currentPersonalInfo.Department = reader.Value;
-                            }
-                            else if (currentElement == "Name" && currentSubject != null)
-                            {
+                                Year = ParseNullableInt(reader.GetAttribute("year")),
+                                Faculty = reader.GetAttribute("faculty") ?? "",
+                                Department = reader.GetAttribute("department") ?? ""
+                            };
+                        }
+                        else if (reader.Name == "Subject")
+                        {
+                            currentSubject = new Subject();
+                        }
+                        break;
+                    
+                    case XmlNodeType.Text:
+                        if (currentStudent == null) break;
+                        
+                        switch (currentElement)
+                        {
+                            case "FullName":
+                                currentStudent.FullName = reader.Value;
+                                break;
+                            case "Faculty":
+                                if (string.IsNullOrEmpty(currentStudent.Faculty))
+                                    currentStudent.Faculty = reader.Value;
+                                break;
+                            case "Department":
+                                if (string.IsNullOrEmpty(currentStudent.Department))
+                                    currentStudent.Department = reader.Value;
+                                break;
+                            case "Name" when currentSubject != null:
                                 currentSubject.Name = reader.Value;
-                            }
-                            else if (currentElement == "Grade" && currentSubject != null)
-                            {
+                                break;
+                            case "Grade" when currentSubject != null:
                                 currentSubject.Grade = reader.Value;
-                            }
-                            break;
-                        
-                        case XmlNodeType.EndElement:
-                            if (reader.Name == "PersonalInfo" && currentStudent != null && currentPersonalInfo != null)
-                            {
-                                currentStudent.PersonalInfo = currentPersonalInfo;
-                                currentPersonalInfo = null;
-                            }
-                            else if (reader.Name == "Subject" && currentStudent != null && currentSubject != null)
-                            {
-                                currentStudent.Subjects.Add(currentSubject);
-                                currentSubject = null;
-                            }
-                            else if (reader.Name == "Student" && currentStudent != null)
-                            {
-                                if (string.IsNullOrWhiteSpace(searchValue) || MatchesSearchCriteria(currentStudent, searchAttribute, searchValue))
-                                {
-                                    students.Add(currentStudent);
-                                }
-                                currentStudent = null;
-                            }
-                            break;
-                    }
+                                break;
+                        }
+                        break;
+                    
+                    case XmlNodeType.EndElement:
+                        if (reader.Name == "Subject" && currentStudent != null && currentSubject != null)
+                        {
+                            currentStudent.Subjects.Add(currentSubject);
+                            currentSubject = null;
+                        }
+                        else if (reader.Name == "Student" && currentStudent != null)
+                        {
+                            students.Add(currentStudent);
+                            currentStudent = null;
+                        }
+                        break;
                 }
             }
-            
-            Logger.Instance.Log("Low", $"SAX парсинг завершено | Знайдено: {students.Count} студент(ів)");
-        }
-        catch (Exception ex)
-        {
-            Logger.Instance.Error($"Помилка SAX парсингу: {ex.Message}");
         }
         
-        return students;
+        if (string.IsNullOrWhiteSpace(searchValue))
+            return students;
+        
+        return students.Where(s => MatchesSearchCriteria(s, searchAttribute, searchValue)).ToList();
     }
     
-
-public List<string> GetAvailableAttributes(string xmlPath)
-{
-    var attributes = new HashSet<string>();
-    
-    try
+    public List<string> GetAvailableAttributes(string xmlPath)
     {
+        var attributes = new HashSet<string>();
+        
         using (XmlReader reader = XmlReader.Create(xmlPath))
         {
             while (reader.Read())
@@ -127,11 +104,7 @@ public List<string> GetAvailableAttributes(string xmlPath)
                         for (int i = 0; i < reader.AttributeCount; i++)
                         {
                             reader.MoveToAttribute(i);
-                            
-                            if (reader.Name == "year")
-                            {
-                                attributes.Add(reader.Name);
-                            }
+                            attributes.Add(reader.Name);
                         }
                         reader.MoveToElement();
                     }
@@ -140,20 +113,11 @@ public List<string> GetAvailableAttributes(string xmlPath)
         }
         
         attributes.Add("FullName");
-        attributes.Add("Faculty");
-        attributes.Add("Department");
-        
         attributes.Add("Subject");
         
-        Logger.Instance.Log("Low", $"SAX: знайдено {attributes.Count} атрибутів");
-    }
-    catch (Exception ex)
-    {
-        Logger.Instance.Error($"Помилка читання атрибутів SAX: {ex.Message}");
+        return attributes.OrderBy(a => a).ToList();
     }
     
-    return attributes.OrderBy(a => a).ToList();
-}
     
     private bool MatchesSearchCriteria(Student student, string searchAttribute, string searchValue)
     {
@@ -165,19 +129,15 @@ public List<string> GetAvailableAttributes(string xmlPath)
         return searchAttribute.ToLower() switch
         {
             "year" => student.Year?.ToString().Contains(searchValue) ?? false,
-            "fullname" => student.PersonalInfo.FullName.ToLower().Contains(searchValue),
-            "faculty" => student.PersonalInfo.Faculty.ToLower().Contains(searchValue),
-            "department" => student.PersonalInfo.Department.ToLower().Contains(searchValue),
+            "fullname" => student.FullName.ToLower().Contains(searchValue),
+            "faculty" => student.Faculty.ToLower().Contains(searchValue),
+            "department" => student.Department.ToLower().Contains(searchValue),
             "subject" => student.Subjects.Any(s => s.Name.ToLower().Contains(searchValue)),
             _ => false
         };
     }
-    
     private int? ParseNullableInt(string? value)
     {
-        if (string.IsNullOrWhiteSpace(value))
-            return null;
-        
         return int.TryParse(value, out var result) ? result : null;
     }
 }

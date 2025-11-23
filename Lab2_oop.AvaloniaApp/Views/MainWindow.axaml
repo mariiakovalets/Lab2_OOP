@@ -159,7 +159,7 @@
 
         <StackPanel Grid.Row="0" 
                     Orientation="Horizontal" 
-                    Spacing="15"
+                    Spacing="125"
                     Margin="15,0,0,20"
                     VerticalAlignment="Center">
             
@@ -168,63 +168,54 @@
                            FontSize="14"
                            FontWeight="SemiBold"
                            Foreground="#172f47"/>
-                <StackPanel Orientation="Horizontal" Spacing="10">
-                    <Button Content="Обрати файл"
-                            Width="180"
-                            Height="40"
-                            Background="White"
-                            Foreground="#172f47"
-                            BorderBrush="#172f47"
-                            BorderThickness="2"
-                            CornerRadius="8"
-                            FontSize="14"
-                            Padding="15,10"
-                            Cursor="Hand"
-                            HorizontalContentAlignment="Center"
-                            VerticalContentAlignment="Center"
-                            x:Name="BtnSelectFile">
-                        <Button.Styles>
-                            <Style Selector="Button:pointerover /template/ ContentPresenter">
-                                <Setter Property="Background" Value="#172f47"/>
-                            </Style>
-                            <Style Selector="Button:pointerover">
-                                <Setter Property="Foreground" Value="White"/>
-                                <Setter Property="BorderBrush" Value="#172f47"/>
-                            </Style>
-                        </Button.Styles>
-                    </Button>
-                    <TextBlock Text="{Binding FileName}"
-                               VerticalAlignment="Center"
-                               x:Name="TxtFilePath"
-                               Foreground="#6b7280"
-                               FontSize="13"/>
-                </StackPanel>
+                <Button Content="{Binding ButtonText}"
+                        Width="180"
+                        Height="40"
+                        Background="White"
+                        Foreground="#172f47"
+                        BorderBrush="#172f47"
+                        BorderThickness="2"
+                        CornerRadius="8"
+                        FontSize="14"
+                        Padding="15,10"
+                        Cursor="Hand"
+                        HorizontalContentAlignment="Center"
+                        VerticalContentAlignment="Center"
+                        x:Name="BtnSelectFile">
+                    <Button.Styles>
+                        <Style Selector="Button:pointerover /template/ ContentPresenter">
+                            <Setter Property="Background" Value="#172f47"/>
+                        </Style>
+                        <Style Selector="Button:pointerover">
+                            <Setter Property="Foreground" Value="White"/>
+                            <Setter Property="BorderBrush" Value="#172f47"/>
+                        </Style>
+                    </Button.Styles>
+                </Button>
+            </StackPanel>
+            
+            <StackPanel Spacing="8">
+                <TextBlock Text="Метод парсингу"
+                           FontSize="14"
+                           FontWeight="SemiBold"
+                           Foreground="#172f47"/>
+                <ComboBox Width="280"
+                          Height="40"
+                          Classes="strategy-combo"
+                          PlaceholderText="Виберіть метод парсингу"
+                          ItemsSource="{Binding ParsingStrategies}"
+                          SelectedIndex="{Binding SelectedStrategyIndex}"
+                          x:Name="CmbParsingStrategy"/>
             </StackPanel>
         </StackPanel>
         
 
-<StackPanel Grid.Row="1" 
-            Orientation="Horizontal" 
-            Spacing="40"
-            Margin="15,0,0,20"
-            VerticalAlignment="Center">
+<Grid Grid.Row="1" 
+      ColumnDefinitions="Auto,Auto,Auto,*,Auto"
+      Margin="15,0,15,20"
+      VerticalAlignment="Center">
     
-
-    <StackPanel Spacing="8">
-        <TextBlock Text="Метод парсингу"
-                   FontSize="14"
-                   FontWeight="SemiBold"
-                   Foreground="#172f47"/>
-        <ComboBox Width="280"
-                  Height="40"
-                  Classes="strategy-combo"
-                  PlaceholderText="Виберіть метод парсингу"
-                  ItemsSource="{Binding ParsingStrategies}"
-                  SelectedIndex="{Binding SelectedStrategyIndex}"
-                  x:Name="CmbParsingStrategy"/>
-    </StackPanel>
-    
-    <StackPanel Spacing="8">
+    <StackPanel Grid.Column="0" Spacing="8" Margin="0,0,25,0">
         <TextBlock Text="Фільтр"
                    FontSize="14"
                    FontWeight="SemiBold"
@@ -244,8 +235,8 @@
         </ComboBox>
     </StackPanel>
     
-    <StackPanel Spacing="8">
-        <TextBlock Text="Виберіть критерій фільтру"
+    <StackPanel Grid.Column="1" Spacing="8" Margin="0,0,25,0">
+        <TextBlock Text="Значення фільтру"
                    FontSize="14"
                    FontWeight="SemiBold"
                    Foreground="#172f47"/>
@@ -264,11 +255,22 @@
         </ComboBox>
     </StackPanel>
     
-    <StackPanel Spacing="8">
-        <TextBlock Text=" "
+    <StackPanel Grid.Column="2" Spacing="8" Margin="0,0,25,0">
+        <TextBlock Text="Ключове слово (необов'язково)"
                    FontSize="14"
-                   FontWeight="SemiBold"/>
-        <Button Content="Шукати"
+                   FontWeight="SemiBold"
+                   Foreground="#172f47"/>
+        <TextBox x:Name="TxtKeyword"
+                 Text="{Binding Keyword, Mode=TwoWay}"
+                 Classes="search-input"
+                 Width="280"
+                 Height="40"
+                 Watermark="Введіть слово для пошуку..."
+                 HorizontalAlignment="Left"/>
+    </StackPanel>
+    
+    <StackPanel Grid.Column="4" Spacing="8" VerticalAlignment="Bottom">
+        <Button Content="Пошук"
                 Width="180"
                 Height="40"
                 Background="White"
@@ -279,6 +281,7 @@
                 FontSize="14"
                 Padding="15,10"
                 Cursor="Hand"
+                HorizontalAlignment="Right"
                 HorizontalContentAlignment="Center"
                 VerticalContentAlignment="Center"
                 x:Name="BtnSearch">
@@ -294,7 +297,7 @@
         </Button>
     </StackPanel>
     
-</StackPanel>
+</Grid>
     
         
         <Border Grid.Row="2" 
@@ -307,11 +310,12 @@
                 
                 <ScrollViewer Grid.Row="1"
                               HorizontalScrollBarVisibility="Auto"
-                              VerticalScrollBarVisibility="Auto">
+                              VerticalScrollBarVisibility="Auto"
+                              MaxHeight="400">
                     <StackPanel>
                     <Grid x:Name="TableHeader"
                         ColumnDefinitions="60,200,60,130,200,150,*"
-                        IsVisible="False"
+                        IsVisible="{Binding IsTableHeaderVisible}"
                         Background="#172f47"
                         Margin="0,0,0,2">
                         <Border Grid.Column="0" BorderBrush="White" BorderThickness="0,0,1,0"/>
@@ -369,7 +373,7 @@
                                                 HorizontalAlignment="Center"/>
                                         
                                         <TextBlock Grid.Column="1" 
-                                                Text="{Binding PersonalInfo.FullName}" 
+                                                Text="{Binding FullName}" 
                                                 Foreground="#172f47" 
                                                 Padding="8" 
                                                 VerticalAlignment="Center"
@@ -390,14 +394,14 @@
                                                 HorizontalAlignment="Center"/>
                                         
                                         <TextBlock Grid.Column="4" 
-                                                Text="{Binding PersonalInfo.Faculty}" 
+                                                Text="{Binding Faculty}" 
                                                 Foreground="#172f47" 
                                                 Padding="8" 
                                                 VerticalAlignment="Center"
                                                 TextWrapping="Wrap"/>
                                         
                                         <TextBlock Grid.Column="5" 
-                                                Text="{Binding PersonalInfo.Department}" 
+                                                Text="{Binding Department}" 
                                                 Foreground="#172f47" 
                                                 Padding="8" 
                                                 VerticalAlignment="Center"
@@ -489,6 +493,7 @@
                     FontSize="14"
                     Padding="12,8"
                     Cursor="Hand"
+                    Margin="0,0,15,0"
                     HorizontalContentAlignment="Center"
                     VerticalContentAlignment="Center"
                     x:Name="BtnExit">

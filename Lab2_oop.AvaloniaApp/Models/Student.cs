@@ -8,46 +8,46 @@ public class Student
     public int RowNumber { get; set; }
     
     public int? Year { get; set; }
-
-    public PersonalInfo PersonalInfo { get; set; } = new PersonalInfo();
+    
+    // Особиста інформація (раніше PersonalInfo)
+    public string FullName { get; set; } = string.Empty;
+    public string Faculty { get; set; } = string.Empty;
+    public string Department { get; set; } = string.Empty;
     
     public List<Subject> Subjects { get; set; } = new List<Subject>();
     
-
     public double AverageGrade
-{
-    get
     {
-        if (Subjects.Count == 0) return 0;
-        
-        double sum = 0;
-        foreach (var subject in Subjects)
+        get
         {
-            if (double.TryParse(subject.Grade, out var grade))
+            if (Subjects.Count == 0) return 0;
+            
+            double sum = 0;
+            foreach (var subject in Subjects)
             {
-                sum += grade;
+                if (double.TryParse(subject.Grade, out var grade))
+                {
+                    sum += grade;
+                }
             }
+            return sum / Subjects.Count;
         }
-        return sum / Subjects.Count;
     }
-}
 
     public string AllGradesDisplay
     {
         get
         {
             if (Subjects == null || !Subjects.Any())
-                return "Немає даних";
+                return "";
             
-        
             return string.Join("\n", Subjects.Select(s => $"{s.Name}: {s.Grade}"));
         }
     }
     
-    
     public override string ToString()
     {
         string year = Year.HasValue ? $" | Курс: {Year}" : "";
-        return $"{PersonalInfo.FullName}{year} | Середній бал: {AverageGrade:F2}";
+        return $"{FullName}{year} | Середній бал: {AverageGrade:F2}";
     }
 }

@@ -4,17 +4,17 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.IO;
+using System.Threading.Tasks;
 using Lab2_oop.AvaloniaApp.Models;
 using Lab2_oop.AvaloniaApp.Parsers;
 using Lab2_oop.AvaloniaApp.Saver;
 using Lab2_oop.AvaloniaApp.LogLibrary;
-using System.Threading.Tasks;
 
 namespace Lab2_oop.AvaloniaApp.ViewModels;
 
 public class MainWindowViewModel : INotifyPropertyChanged
 {
-    // ========== INotifyPropertyChanged ==========
     public event PropertyChangedEventHandler? PropertyChanged;
     
     protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
@@ -22,15 +22,16 @@ public class MainWindowViewModel : INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
     
-    // ========== ПРИВАТНІ ПОЛЯ ==========
     private string? _currentXmlFilePath;
     private IXmlParserStrategy? _currentStrategy;
     private List<Student> _currentFilteredStudents = new();
+    private readonly StudentSearchService _searchService;
     
     private string _fileName = "Файл не обрано";
+    private string _buttonText = "Обрати файл";
     private bool _isTableHeaderVisible;
+    private string _keyword = string.Empty;
     
-    // ========== ПУБЛІЧНІ ВЛАСТИВОСТІ ==========
     
     public string FileName
     {
@@ -45,6 +46,19 @@ public class MainWindowViewModel : INotifyPropertyChanged
         }
     }
     
+    public string ButtonText
+    {
+        get => _buttonText;
+        set
+        {
+            if (_buttonText != value)
+            {
+                _buttonText = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+    
     public bool IsTableHeaderVisible
     {
         get => _isTableHeaderVisible;
@@ -53,6 +67,19 @@ public class MainWindowViewModel : INotifyPropertyChanged
             if (_isTableHeaderVisible != value)
             {
                 _isTableHeaderVisible = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+    
+    public string Keyword
+    {
+        get => _keyword;
+        set
+        {
+            if (_keyword != value)
+            {
+                _keyword = value;
                 OnPropertyChanged();
             }
         }
@@ -73,24 +100,22 @@ public class MainWindowViewModel : INotifyPropertyChanged
     public int SelectedAttributeIndex { get; set; } = -1;
     public int SelectedValueIndex { get; set; } = -1;
     
-    // ========== ACTIONS ==========
     public Action<string>? ShowErrorAction;
-    public Func<Task>? ShowExitConfirmationAction;
     public Func<Task<string?>>? ShowFileSaveDialogAction;
     
-    // ========== КОНСТРУКТОР ==========
     public MainWindowViewModel()
     {
-        Logger.Instance.Log("High", "ViewModel ініціалізовано");
+        _searchService = new StudentSearchService();
+        Logger.Instance.Log("High", "Програма запущена");
     }
     
-    // ========== МЕТОДИ ==========
     
     public void SetFilePath(string filePath)
     {
         _currentXmlFilePath = filePath;
-        string fileName = System.IO.Path.GetFileName(filePath);
+        string fileName = Path.GetFileName(filePath);
         FileName = fileName;
+        ButtonText = "Обрано файл";
         
         Logger.Instance.Log("Medium", $"Обрано файл: {filePath}");
         
@@ -135,14 +160,14 @@ public class MainWindowViewModel : INotifyPropertyChanged
         SearchAttributes.Clear();
         SearchAttributes.Add(new { Display = "всі студенти", Tag = "" });
         
-        var translations = new Dictionary<string, string>
-        {
-            { "FullName", "ПІБ" },
-            { "year", "Курс" },
-            { "Faculty", "Факультет" },
-            { "Department", "Кафедра" },
-            { "Subject", "Дисципліна" }
-        };
+        var translations = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+{
+    { "FullName", "ПІБ" },
+    { "year", "Курс" },
+    { "faculty", "Факультет" },
+    { "department", "Кафедра" },
+    { "Subject", "Дисципліна" }
+};
         
         foreach (var attr in attributes)
         {
@@ -184,9 +209,9 @@ public class MainWindowViewModel : INotifyPropertyChanged
             string? value = attribute.ToLower() switch
             {
                 "year" => student.Year?.ToString(),
-                "fullname" => student.PersonalInfo?.FullName,
-                "faculty" => student.PersonalInfo?.Faculty,
-                "department" => student.PersonalInfo?.Department,
+                "fullname" => student.FullName,
+                "faculty" => student.Faculty,
+                "department" => student.Department,
                 "subject" => null,
                 _ => null
             };
@@ -248,13 +273,13 @@ public class MainWindowViewModel : INotifyPropertyChanged
         
         try
         {
-            var results = _currentStrategy.ParseStudents(_currentXmlFilePath, searchAttribute, searchValue);
-            results = results.OrderByDescending(s => s.AverageGrade).ToList();
-            
-            for (int i = 0; i < results.Count; i++)
-            {
-                results[i].RowNumber = i + 1;
-            }
+            var results = _searchService.Search(
+                _currentXmlFilePath,
+                _currentStrategy,
+                searchAttribute,
+                searchValue,
+                Keyword
+            );
             
             _currentFilteredStudents = results;
             
@@ -266,7 +291,8 @@ public class MainWindowViewModel : INotifyPropertyChanged
             
             IsTableHeaderVisible = results.Count > 0;
             
-            Logger.Instance.Log("Medium", $"Знайдено {results.Count} студент(ів) | Стратегія: {_currentStrategy.StrategyName}");
+            string keywordInfo = !string.IsNullOrWhiteSpace(Keyword) ? $" + ключове слово: '{Keyword}'" : "";
+            Logger.Instance.Log("Medium", $"Знайдено {results.Count} студент(ів) | Стратегія: {_currentStrategy.StrategyName}{keywordInfo}");
         }
         catch (Exception ex)
         {
@@ -283,9 +309,11 @@ public class MainWindowViewModel : INotifyPropertyChanged
         _currentFilteredStudents.Clear();
         
         FileName = "Файл не обрано";
+        ButtonText = "Обрати файл";
         SelectedStrategyIndex = -1;
         SelectedAttributeIndex = -1;
         SelectedValueIndex = -1;
+        Keyword = string.Empty;
         IsTableHeaderVisible = false;
         
         SearchAttributes.Clear();
@@ -305,16 +333,16 @@ public class MainWindowViewModel : INotifyPropertyChanged
         
         if (_currentFilteredStudents == null || _currentFilteredStudents.Count == 0)
         {
-            ShowErrorAction?.Invoke("Немає даних для трансформації! Натисніть 'Показати' спочатку.");
+            ShowErrorAction?.Invoke("Немає даних для трансформації!");
             return;
         }
         
         try
         {
-            string xmlDirectory = System.IO.Path.GetDirectoryName(_currentXmlFilePath) ?? "";
-            string xslPath = System.IO.Path.Combine(xmlDirectory, "students.xsl");
+            string xmlDirectory = Path.GetDirectoryName(_currentXmlFilePath) ?? "";
+            string xslPath = Path.Combine(xmlDirectory, "students.xsl");
             
-            if (!System.IO.File.Exists(xslPath))
+            if (!File.Exists(xslPath))
             {
                 Logger.Instance.Error($"XSL не знайдено: {xslPath}");
                 ShowErrorAction?.Invoke($"XSL файл не знайдено!\nПоставте students.xsl в папку:\n{xmlDirectory}");
@@ -332,7 +360,6 @@ public class MainWindowViewModel : INotifyPropertyChanged
                 return;
             }
             
-            // Використовуємо новий інтерфейс ISaver
             var htmlSaver = new HtmlSaver();
             bool success = htmlSaver.Save(_currentFilteredStudents, outputPath, xslPath);
             
@@ -351,10 +378,6 @@ public class MainWindowViewModel : INotifyPropertyChanged
                 }
                 catch { }
             }
-            else
-            {
-                ShowErrorAction?.Invoke("Помилка при створенні HTML файлу!");
-            }
         }
         catch (Exception ex)
         {
@@ -362,13 +385,13 @@ public class MainWindowViewModel : INotifyPropertyChanged
             ShowErrorAction?.Invoke($"Помилка: {ex.Message}");
         }
     }
-    
     private void ClearSearchData()
     {
         _currentStrategy = null;
         SelectedStrategyIndex = -1;
         SelectedAttributeIndex = -1;
         SelectedValueIndex = -1;
+        Keyword = string.Empty;
         IsTableHeaderVisible = false;
         SearchAttributes.Clear();
         SearchValues.Clear();
